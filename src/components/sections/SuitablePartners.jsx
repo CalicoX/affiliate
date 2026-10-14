@@ -200,7 +200,7 @@ export default function SuitablePartners() {
               const nearest = Math.abs(delta) < 0.5;
               return (
                 <div
-                  className="af-partner-copy"
+                  className={nearest ? "af-partner-copy is-current" : "af-partner-copy"}
                   key={item.id}
                   aria-hidden={!nearest}
                   style={{

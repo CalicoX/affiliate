@@ -571,9 +571,12 @@ button.btn-split {
   clip-path: inset(0);
 }
 
-.af-partners-texts .af-partner-copy[aria-hidden="true"] .btn-switch,
-.af-partners-texts .af-partner-copy[aria-hidden="true"] .btn-switch-knob {
+/* The copy is translated, so overflow/clip-path on it does not contain the
+   button's drop shadow. Only the resting slide may paint one. */
+.affiliate-page .af-partners-texts .af-partner-copy:not(.is-current) button.btn-switch,
+.affiliate-page .af-partners-texts .af-partner-copy:not(.is-current) button.btn-switch .btn-switch-knob {
   box-shadow: none !important;
+  filter: none !important;
 }
 
 .af-partners-texts h3 {
