@@ -115,6 +115,19 @@ export default function SuitablePartners() {
     const onTouchStart = (event) => {
       touchY = event.touches[0]?.clientY ?? null;
     };
+    const onTouchMove = (event) => {
+      if (reduced || touchY == null || !engaged()) return;
+      const y = event.touches[0]?.clientY;
+      if (y == null) return;
+      const dy = touchY - y;
+      if (Math.abs(dy) < 10) return;
+      const dir = dy > 0 ? 1 : -1;
+      const idx = progressIndex();
+      const atStart = idx < 0.04 && dir < 0;
+      const atEnd = idx > count - 1 - 0.04 && dir > 0;
+      if (atStart || atEnd) return;
+      event.preventDefault();
+    };
     const onTouchEnd = (event) => {
       if (touchY == null || reduced) return;
       const endY = event.changedTouches[0]?.clientY ?? touchY;
@@ -129,6 +142,7 @@ export default function SuitablePartners() {
     window.addEventListener("resize", onScroll);
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
@@ -137,19 +151,21 @@ export default function SuitablePartners() {
       window.removeEventListener("resize", onScroll);
       window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
   }, [count]);
 
   return (
-    <section className="af-partners-scroll" id="who-we-partner" ref={trackRef}>
-      <div className="af-partners-sticky">
-        <div className="section-head center">
-          <p className="af-eyebrow">{PARTNER_TYPES.eyebrow}</p>
-          <h2>{PARTNER_TYPES.title}</h2>
-          <p className="lead">{PARTNER_TYPES.lead}</p>
-        </div>
+    <>
+      <div className="section-head center af-partners-intro" id="who-we-partner">
+        <p className="af-eyebrow">{PARTNER_TYPES.eyebrow}</p>
+        <h2 id="who-we-partner-heading">{PARTNER_TYPES.title}</h2>
+        <p className="lead">{PARTNER_TYPES.lead}</p>
+      </div>
 
+      <section className="af-partners-scroll" ref={trackRef} aria-labelledby="who-we-partner-heading">
+      <div className="af-partners-sticky">
         <div className="af-partners-stage">
           <div className="af-partners-visual">
             {PARTNER_TYPES.items.map((item, i) => {
@@ -169,7 +185,7 @@ export default function SuitablePartners() {
                     glassStyle={{
                       "--ui-y": `${delta * -100}%`,
                       "--ui-x": "0px",
-                      "--card-o": "1",
+                      "--card-o": Number(open) === 0 ? "0" : "1",
                       "--card-open": open,
                     }}
                   />
@@ -201,6 +217,7 @@ export default function SuitablePartners() {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   );
 }

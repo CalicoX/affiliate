@@ -469,6 +469,15 @@ button.btn-split {
 .af-partners-scroll {
   height: 320vh;
   position: relative;
+  scroll-margin-top: var(--topbar-h, 64px);
+}
+
+/* Title is a normal block above the scroll track, outside the sticky stage. */
+.af-partners-intro {
+  width: min(760px, calc(100% - 2 * var(--page-pad-x)));
+  margin-bottom: clamp(20px, 3vw, 36px);
+  padding-top: clamp(28px, 4vw, 48px);
+  scroll-margin-top: var(--topbar-h, 64px);
 }
 
 .af-partners-sticky {
@@ -487,7 +496,7 @@ button.btn-split {
   grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
   gap: 48px;
   align-items: center;
-  margin-top: 28px;
+  margin-top: 0;
 }
 
 .af-partners-visual {
@@ -498,6 +507,8 @@ button.btn-split {
 .af-slide {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  border-radius: 20px;
 }
 
 .af-slide-bg {
@@ -523,7 +534,8 @@ button.btn-split {
 .af-partners-texts {
   position: relative;
   height: min(560px, calc(100vh - 320px));
-  overflow: hidden;
+  overflow: clip;
+  contain: paint;
 }
 
 .af-partners-visual .rt-illu-card {
@@ -531,6 +543,19 @@ button.btn-split {
   transform: none;
   /* unfolds downward from the top edge; type stays full size */
   clip-path: inset(0 0 calc((1 - var(--card-open, 1)) * 100%) 0 round 16px);
+}
+
+/* Partner slide only: slightly narrower than the shared 68% / 58% cards. */
+.af-partners-visual .rt-illu-card--back {
+  width: 58%;
+}
+
+.af-partners-visual .rt-illu-card--front {
+  width: 50%;
+}
+
+.af-partners-visual .rt-illu-card--front li {
+  white-space: nowrap;
 }
 
 .af-partners-texts .af-partner-copy {
@@ -542,6 +567,13 @@ button.btn-split {
   justify-content: center;
   gap: 12px;
   transition: none;
+  /* Keep each slide's button shadow inside this copy, including the blur. */
+  clip-path: inset(0);
+}
+
+.af-partners-texts .af-partner-copy[aria-hidden="true"] .btn-switch,
+.af-partners-texts .af-partner-copy[aria-hidden="true"] .btn-switch-knob {
+  box-shadow: none !important;
 }
 
 .af-partners-texts h3 {
@@ -558,8 +590,10 @@ button.btn-split {
 }
 
 .af-partners-visual {
-  overflow: hidden;
+  overflow: clip;
+  contain: paint;
   border-radius: 20px;
+  isolation: isolate;
 }
 
 .af-benefit-item .rt-illu {
@@ -1358,6 +1392,7 @@ button.btn-switch {
 
 .af-modal-backdrop {
   position: absolute;
+  z-index: 0;
   inset: 0;
   border: 0;
   background: rgba(10, 10, 10, 0.55);
@@ -1366,6 +1401,7 @@ button.btn-switch {
 
 .af-modal-panel {
   position: relative;
+  z-index: 1;
   width: min(920px, 100%);
   height: min(860px, calc(100vh - 48px));
   background: #fff;
@@ -1374,6 +1410,8 @@ button.btn-switch {
   display: flex;
   flex-direction: column;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  color: #0a0a0a;
 }
 
 .af-modal-bar {
@@ -1396,56 +1434,327 @@ button.btn-switch {
   padding: 0 4px;
 }
 
-/* The form is a cross-origin iframe with its own page gutter and card.
-   Shift and scale so the visible area is the card face: past the page
-   nav, the outer padding, and the card border/radius. */
-.af-modal-frame-clip {
-  position: relative;
+.af-modal-body {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
+  padding: 24px 28px 28px;
   background: #fff;
-  container-type: size;
+  overscroll-behavior: contain;
 }
 
-.af-modal-frame {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100cqw;
-  height: calc(124px + 832px * (100cqh / 100cqw));
+.af-form-grid,
+.af-form-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.af-form-section {
+  grid-column: 1 / -1;
+  align-items: start;
+}
+
+.af-form-field {
+  min-width: 0;
+}
+
+.af-form-span {
+  grid-column: 1 / -1;
+}
+
+.af-form-label {
+  display: block;
+  margin: 0 0 6px;
+  color: #0a0a0a;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.af-form-req {
+  color: #c9371d;
+  font-weight: 600;
+}
+
+.af-form-section-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.af-form-section-copy .af-form-label {
+  margin-bottom: 0;
+}
+
+.af-form-help,
+.af-form-note {
+  margin: 0;
+  color: #5c6370;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.af-form-note strong {
+  color: #0a0a0a;
+  font-weight: 600;
+}
+
+.af-form-control {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #e6e8ec;
+  border-radius: 12px;
+  background-color: #fff;
+  color: #0a0a0a;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  outline: none;
+  box-shadow: none;
+}
+
+.af-form-control::placeholder {
+  color: #8a919c;
+}
+
+.af-form-control:hover {
+  border-color: #d0d4dc;
+}
+
+.af-form-control:focus {
+  border-color: #003a9b;
+  box-shadow: 0 0 0 3px rgba(0, 58, 155, 0.12);
+}
+
+.af-form-control.is-invalid {
+  border-color: #c9371d;
+}
+
+.af-form-control.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(201, 55, 29, 0.12);
+}
+
+textarea.af-form-control {
+  min-height: 104px;
+  padding-top: 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+select.af-form-control {
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6.2 8 10l4-3.8' stroke='%235c6370' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+}
+
+select.af-form-control.is-placeholder {
+  color: #8a919c;
+}
+
+select.af-form-control option {
+  color: #0a0a0a;
+}
+
+.af-form-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.af-form-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #e6e8ec;
+  border-radius: 12px;
+  background: #fff;
+  color: #0a0a0a;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.af-form-choice input {
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  accent-color: #003a9b;
+  flex: 0 0 auto;
+}
+
+.af-form-choice.is-checked,
+.af-form-choice:focus-within {
+  border-color: #003a9b;
+}
+
+.af-form-choice-other {
+  grid-column: 1 / -1;
+  align-items: center;
+  cursor: text;
+}
+
+.af-form-choice-other label {
+  flex: 0 0 auto;
+  margin: 0;
+  color: #0a0a0a;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.af-form-choice-other .af-form-inline {
+  flex: 1 1 auto;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
   border: 0;
-  background: #fff;
-  transform-origin: 0 0;
-  transform:
-    translate(
-      calc(((100cqw - 860px) / 2 + 14px) * (100cqw / 832px) * -1),
-      calc(124px * (100cqw / 832px) * -1)
-    )
-    scale(calc(100cqw / 832px));
+  background: transparent;
+  color: #0a0a0a;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  outline: none;
+  accent-color: auto;
 }
 
-@container (max-width: 900px) {
-  .af-modal-frame {
-    height: calc(124px + (100cqw - 68px) * (100cqh / 100cqw));
-    transform:
-      translate(
-        calc(34px * (100cqw / (100cqw - 68px)) * -1),
-        calc(124px * (100cqw / (100cqw - 68px)) * -1)
-      )
-      scale(calc(100cqw / (100cqw - 68px)));
+.af-form-inline::placeholder {
+  color: #8a919c;
+}
+
+.af-form-error {
+  margin: 6px 0 0;
+  color: #c9371d;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.af-form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0 0;
+  color: #5c6370;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.af-form-consent input {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #003a9b;
+  flex: 0 0 auto;
+}
+
+.af-form-consent a {
+  color: #003a9b;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.af-form-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e6e8ec;
+}
+
+.af-form-submit {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: #003a9b;
+  color: #fff;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.af-form-submit:hover {
+  filter: brightness(1.08);
+}
+
+.af-form-submit:focus-visible {
+  outline: 2px solid #003a9b;
+  outline-offset: 2px;
+}
+
+.af-form-success {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 100%;
+  text-align: center;
+  gap: 12px;
+  padding: 48px 12px;
+}
+
+.af-form-success h2 {
+  margin: 0;
+  color: #0a0a0a;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.af-form-success h2:focus {
+  outline: none;
+}
+
+.af-form-success p {
+  max-width: 46ch;
+  margin: 0;
+  color: #5c6370;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.af-form-success .af-form-submit {
+  width: min(100%, 320px);
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .af-modal-body {
+    padding: 20px 16px 24px;
   }
-}
 
-@container (max-width: 650px) {
-  .af-modal-frame {
-    height: calc(92px + (100cqw - 52px) * (100cqh / 100cqw));
-    transform:
-      translate(
-        calc(26px * (100cqw / (100cqw - 52px)) * -1),
-        calc(92px * (100cqw / (100cqw - 52px)) * -1)
-      )
-      scale(calc(100cqw / (100cqw - 52px)));
+  .af-form-grid,
+  .af-form-section,
+  .af-form-choices {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1456,13 +1765,24 @@ button.btn-switch {
   }
 }
 
+@media (max-width: 1024px) {
+  .af-partners-visual {
+    height: max(480px, min(560px, calc(100vh - 320px)));
+  }
+
+  .af-partners-visual .af-slide-bg[src*="theme-ups-flight"] {
+    object-fit: cover !important;
+    object-position: center center !important;
+    background-color: transparent;
+  }
+}
+
 @media (max-width: 900px) {
   .af-benefit-row,
   .af-partners-stage {
     grid-template-columns: 1fr;
   }
 
-  .af-partners-visual,
   .af-partners-texts {
     height: 240px;
   }
@@ -1494,10 +1814,11 @@ button.btn-switch {
     height: 480px;
   }
 
-  /* Logistics photo is a wide shot; cover crops the tail on a narrow frame. */
+  /* Fill the rounded frame. Inline styles keep desktop at cover / center top. */
   .af-partners-visual .af-slide-bg[src*="theme-ups-flight"] {
-    object-fit: contain !important;
-    background-color: #7891a3;
+    object-fit: cover !important;
+    object-position: center center !important;
+    background-color: transparent;
   }
 
   .af-partners-visual .rt-illu-card--carriers {
@@ -1521,6 +1842,60 @@ button.btn-switch {
 
   .af-benefit-item .rt-illu {
     margin-bottom: 14px;
+  }
+}
+
+/* Tablet only: photo and copy alternate. Phone stays stacked; wide desktop stays 3-up. */
+@media (min-width: 768px) and (max-width: 1100px) {
+  .af-benefit-row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 32px;
+  }
+
+  .af-benefit-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr auto auto 1fr;
+    column-gap: clamp(28px, 4vw, 40px);
+    align-items: center;
+    padding-bottom: 0;
+    text-align: left;
+  }
+
+  .af-benefit-item .rt-illu {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: stretch;
+    width: 100%;
+    height: clamp(240px, 32vw, 360px);
+    margin: 0;
+  }
+
+  .af-benefit-item h3,
+  .af-benefit-item p {
+    grid-column: 2;
+    max-width: none;
+    text-align: left;
+  }
+
+  .af-benefit-item h3 {
+    grid-row: 2;
+    align-self: end;
+  }
+
+  .af-benefit-item p {
+    grid-row: 3;
+    align-self: start;
+    margin-top: 12px;
+  }
+
+  .af-benefit-item:nth-child(even) .rt-illu {
+    grid-column: 2;
+  }
+
+  .af-benefit-item:nth-child(even) h3,
+  .af-benefit-item:nth-child(even) p {
+    grid-column: 1;
   }
 }
 
@@ -1589,29 +1964,49 @@ button.btn-switch {
   }
 }
 
-/* Mobile: the viewport-height sticky frame centers a stack taller than the
-   screen, so the intro heading overflows above the section and the previous
-   block covers it. Pin the slider stage instead, and let the heading wrap. */
+/* Mobile: center the photo + copy in the viewport below the nav.
+   The section title stays outside this frame. The stage must not stretch
+   to the frame height, or flex centering pins it to the top. */
 @media (max-width: 768px) {
-  .af-partners-scroll {
-    scroll-margin-top: var(--topbar-h, 64px);
-  }
-
   .af-partners-sticky {
-    position: static;
-    display: block;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .af-partners-stage {
     position: sticky;
     top: var(--topbar-h, 64px);
-    margin-top: 0;
+    height: calc(100vh - var(--topbar-h, 64px));
+    height: calc(100dvh - var(--topbar-h, 64px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--page-pad-x);
+    overflow: visible;
     background: var(--bg-page, #fff);
   }
 
-  #who-we-partner .section-head h2,
+  .af-partners-stage {
+    position: relative;
+    top: auto;
+    flex: 0 0 auto;
+    align-self: center;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    gap: 20px;
+    background: transparent;
+  }
+
+  .af-partners-visual {
+    height: 480px;
+  }
+
+  .af-partners-texts {
+    height: 192px;
+  }
+
+  .af-partners-texts .af-partner-copy {
+    justify-content: flex-start;
+  }
+
+  #who-we-partner h2,
   .af-partners-texts .af-partner-copy h3 {
     height: auto;
     max-height: none;

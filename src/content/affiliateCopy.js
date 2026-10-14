@@ -1,7 +1,5 @@
 /** Affiliate landing copy — from PRD《Affiliate 落地页》 */
 
-export const FORM_URL = "https://vercel-affiliate-form-szz4.vercel.app/";
-
 export const HERO = {
   title: "Partner with 17TRACK.",
   lead:

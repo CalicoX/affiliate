@@ -1,10 +1,16 @@
-import { useEffect } from "react";
-import { FORM_URL } from "../content/affiliateCopy.js";
+import { useEffect, useRef } from "react";
+import PartnerApplicationForm from "./PartnerApplicationForm.jsx";
 
 /**
- * Become a partner — iframe modal to the PRD form.
+ * Become a partner — local application form in the page modal.
+ * The dimmed backdrop used to be a button closed on click. Native selects
+ * dispatch that click onto whatever sits underneath when their menu closes,
+ * so choosing an option dismissed the dialog. Close only on a pointer press
+ * that actually starts on the backdrop.
  */
 export default function PartnerFormModal({ open, onClose }) {
+  const panelRef = useRef(null);
+
   useEffect(() => {
     if (!open) return undefined;
     const prev = document.body.style.overflow;
@@ -21,22 +27,25 @@ export default function PartnerFormModal({ open, onClose }) {
 
   if (!open) return null;
 
+  function onBackdropPointerDown(event) {
+    if (event.target !== event.currentTarget) return;
+    const active = document.activeElement;
+    if (active && panelRef.current?.contains(active) && active.tagName === "SELECT") return;
+    onClose();
+  }
+
   return (
     <div className="af-modal" role="dialog" aria-modal="true" aria-label="Become a partner">
-      <button type="button" className="af-modal-backdrop" aria-label="Close" onClick={onClose} />
-      <div className="af-modal-panel">
+      <div className="af-modal-backdrop" onPointerDown={onBackdropPointerDown} />
+      <div className="af-modal-panel" ref={panelRef}>
         <header className="af-modal-bar">
           <strong>Become a partner</strong>
           <button type="button" className="af-modal-close" onClick={onClose} aria-label="Close form">
             ×
           </button>
         </header>
-        <div className="af-modal-frame-clip">
-          <iframe
-            className="af-modal-frame"
-            title="17TRACK Partnership Application"
-            src={FORM_URL}
-          />
+        <div className="af-modal-body">
+          <PartnerApplicationForm />
         </div>
       </div>
     </div>
