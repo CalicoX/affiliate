@@ -16,7 +16,7 @@ function Frame({ src, position = "center center", shift = "none", children }) {
       {src ? (
         <img src={src} alt="" style={{ objectPosition: position, transform: shift }} />
       ) : null}
-      <div className="rt-illu-glass">{children}</div>
+      {children ? <div className="rt-illu-glass">{children}</div> : null}
     </div>
   );
 }
@@ -165,45 +165,13 @@ export function CarrierScene() {
 }
 
 export function LogisticsScene() {
-  return (
-    <Frame src="/assets/scenes/theme-benefit-logistics.jpg">
-      <article className="rt-illu-card rt-illu-card--wide af-bglass af-bglass--up">
-        <p>Global tracking</p>
-        <div className="af-bglass-route" aria-hidden="true">
-          <span>Pickup</span>
-          <i />
-          <span className="is-now">Transit</span>
-          <i />
-          <span>Delivered</span>
-        </div>
-      </article>
-    </Frame>
-  );
+  return <Frame src="/assets/scenes/theme-benefit-logistics-v2.jpg" />;
 }
 
 export function CommissionScene() {
-  return (
-    <Frame src="/assets/scenes/theme-benefit-referral.jpg">
-      <article className="rt-illu-card rt-illu-card--wide af-bglass af-bglass--right">
-        <p>Commission</p>
-        <strong>8–15%</strong>
-        <em>per qualified referral</em>
-      </article>
-    </Frame>
-  );
+  return <Frame src="/assets/scenes/theme-benefit-referral-v2.jpg" />;
 }
 
 export function ValueScene() {
-  return (
-    <Frame src="/assets/scenes/theme-benefit-customer.jpg">
-      <article className="rt-illu-card rt-illu-card--wide af-bglass af-bglass--right">
-        <p>For customers</p>
-        <ul>
-          <li>Fewer tickets</li>
-          <li>Repeat orders</li>
-          <li>Branded updates</li>
-        </ul>
-      </article>
-    </Frame>
-  );
+  return <Frame src="/assets/scenes/theme-benefit-customer-v2.jpg" />;
 }
